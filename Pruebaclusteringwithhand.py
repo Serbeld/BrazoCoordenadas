@@ -1,6 +1,5 @@
-import cv2
+import cv2, serial, graphviz
 import numpy as np
-import serial
 from sklearn import tree
 
 ##Caracteristicas del Árbol de decisiones
@@ -20,9 +19,6 @@ ser = serial.Serial('/dev/ttyUSB0', 9600)
 
 while(True):
     
-    ## Se realiza el Ajuste interno del clustering   
-    clasificador = clasificador.fit(caracteristicas, targets)
-    
     # Capture frame-by-frame
     ret, camara = cap.read()
 
@@ -38,11 +34,14 @@ while(True):
     
     area = int(moments['m00'])
     
-    ## Salida de la clasificación   
-    prediccion = clasificador.predict(area)
-    
     if (caracteristicas[0][0] != 0 and caracteristicas[1][0] != 0):
+          
+        ## Se realiza el Ajuste interno del clustering   
+        clasificador = clasificador.fit(caracteristicas, targets)
         
+        ## Salida de la clasificación   
+        prediccion = clasificador.predict(area)
+    
         if   (prediccion == 'Mano abierta'):
             resultado = "El led del arduino esta en AZUL"
             encendido = b"H"
@@ -58,19 +57,33 @@ while(True):
     
     cv2.imshow('Python Camara', mask)
     
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+##        Sale del ciclo while
         break
     
     if cv2.waitKey(1) & 0xFF == ord('a'):
+##        Guarda el valor de pixeles con la mano abierta
         caracteristicas[0][0] = area
         print('Abierta')
         
     if cv2.waitKey(1) & 0xFF == ord('c'):
+##        Guarda el valor de pixeles con la mano cerrada
         caracteristicas[1][0] = area
         print('Cerrada')
+        
+    if cv2.waitKey(1) & 0xFF == ord('g'):
+##        Genera el gráfico del Arbol de decisiones
+        dot_data = tree.export_graphviz(clasificador, out_file=None, 
+                         feature_names =  ['Cantidad de pixeles en Blanco'],
+                        class_names =  ['Mano abierta','Mano cerrada'],  
+                         filled=True, rounded=True,  
+                         special_characters=True)
+        graph = graphviz.Source(dot_data)
+        graph.render("Visión Artificial")
+        
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
 ser.close();
-
+print("Saliste")
 ##Autor Sergio Beleño
