@@ -1,5 +1,5 @@
-# ManoElectr-nica  :octocat:
-Este repositorio va orientado a los trabajos de visión artificial para una prótesis electrónica 
-Todo esto implementado desde el lenguaje de programación orientado a objetos (Python)
+# BrazoCoordenadas  :octocat:
+Este repositorio va orientado a los trabajos de visión artificial para el control de un brazo robótico. 
+Todo esto implementado desde Python...
 
 En construcción...
